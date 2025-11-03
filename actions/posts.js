@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 
-import { storePost } from "@/lib/posts";
+import { storePost, updatePostLikeStatus } from "@/lib/posts";
 import { uploadImage } from "@/lib/cloudinary";
 
 export async function createPost(prevState, formData) {
@@ -28,18 +28,24 @@ export async function createPost(prevState, formData) {
     return { errors };
   }
 
+  let imageURL;
+
   try {
-    const imageURL = await uploadImage(image);
+    imageURL = await uploadImage(image);
   } catch (error) {
     throw new Error("Image upload failed. Please try again.");
   }
 
   await storePost({
-    imageUrl: "",
+    imageUrl: imageURL,
     title,
     content,
     userId: 1,
   });
 
   redirect("/feed");
+}
+
+export async function tooglePostLikeStatus(postId, formData) {
+  updatePostLikeStatus(postId, 2);
 }
